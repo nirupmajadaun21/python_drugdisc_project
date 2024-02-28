@@ -1,4 +1,4 @@
-# python_drugdisc_project
+# python_drugdiscovery_project
 
 END to END Implementation
 
