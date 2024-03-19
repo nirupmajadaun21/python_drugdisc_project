@@ -57,32 +57,43 @@ with st.sidebar.header('1. Upload your CSV data'):
     st.sidebar.markdown("""
 [Example input file](https://github.com/nirupmajadaun21/python_drugdiscovery_project/tree/main/bioactivity-prediction-app-main/example_acetylcholinesterase.txt)
 """)
+    print(f"Uploaded File: {uploaded_file}")
 
 if st.sidebar.button('Predict'):
-    load_data = pd.read_table(uploaded_file, sep=' ', header=None)
-    load_data.to_csv('molecule.smi', sep = '\t', header = False, index = False)
+    try:
+        print("Attempting to read the file...")
+        if uploaded_file is None:
+            raise ValueError("No file uploaded.")
+        
+        load_data = pd.read_table(uploaded_file, sep=' ', header=None)
+        load_data.to_csv('molecule.smi', sep='\t', header=False, index=False)
+        print(f"File read successfully. Data: {load_data}")
 
-    st.header('**Original input data**')
-    st.write(load_data)
+        st.header('**Original input data**')
+        st.write(load_data)
 
-    with st.spinner("Calculating descriptors..."):
-        desc_calc()
+        with st.spinner("Calculating descriptors..."):
+            desc_calc()
 
-    # Read in calculated descriptors and display the dataframe
-    st.header('**Calculated molecular descriptors**')
-    desc = pd.read_csv('descriptors_output.csv')
-    st.write(desc)
-    st.write(desc.shape)
+        # Read in calculated descriptors and display the dataframe
+        st.header('**Calculated molecular descriptors**')
+        desc = pd.read_csv('descriptors_output.csv')
+        st.write(desc)
+        st.write(desc.shape)
 
-    # Read descriptor list used in previously built model
-    st.header('**Subset of descriptors from previously built models**')
-    Xlist = list(pd.read_csv('descriptor_list.csv').columns)
-    desc_subset = desc[Xlist]
-    st.write(desc_subset)
-    st.write(desc_subset.shape)
+        # Read descriptor list used in previously built model
+        st.header('**Subset of descriptors from previously built models**')
+        Xlist = list(pd.read_csv('descriptor_list.csv').columns)
+        desc_subset = desc[Xlist]
+        st.write(desc_subset)
+        st.write(desc_subset.shape)
 
-    # Apply trained model to make prediction on query compounds
-    build_model(desc_subset)
+        # Apply trained model to make prediction on query compounds
+        build_model(desc_subset)
+    
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        st.error(f"An error occurred: {e}")
+        st.exception(e)
 else:
     st.info('Upload input data in the sidebar to start!')
-    
